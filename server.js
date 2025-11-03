@@ -3,7 +3,7 @@ require('./init-db.js');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const moment = require('moment-timezone');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
