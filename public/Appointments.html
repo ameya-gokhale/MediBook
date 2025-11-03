@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Book Appointment</title>
+	<style>
+    * {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+    }
+    body {
+		font-family: Arial, Helvetica, sans-serif;
+		line-height: 1.6;
+		background: #fff;
+		color: #111;
+    }
+
+    h1 {
+		text-align: center;
+		margin-bottom: 2rem;
+		font-size: 2.5rem;
+		color: #228b22;
+    }
+
+    .menu {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.5rem;
+		margin-left: 20px;
+  		margin-right: 20px;
+    }
+
+    .slot {
+		background: #fff;
+		padding: 1.5rem;
+		border-radius: 1rem;
+		box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+		transition: transform 0.3s;
+		margin-bottom: 1rem;
+		display: grid
+    }
+
+    .slot:hover {
+		transform: translateY(-5px);
+    }
+
+    .slot h3 {
+		margin: 1rem 0 0.5rem;
+		font-size: 1.25rem;
+    }
+
+    .slot p {
+		color: #777;
+		font-size: 0.95rem;
+		margin-bottom: 1rem;
+    }
+
+    .book {
+		display: flex;
+		justify-content: space-between;
+		/*align-slots: center;*/
+    }
+
+    .book_btn {
+		background: #228B22;
+		border: none;
+		color: #fff;
+		padding: 0.5rem 1rem;
+		border-radius: 20px;
+		cursor: pointer;
+		font-weight: 600;
+		transition: background 0.3s;
+		width: 100px
+    }
+
+    .book_btn:hover {
+		background: #006400;
+    }
+	
+	.book_btn:disabled {
+		background: #ccc;
+		cursor: not-allowed;
+	}
+	
+	.date_btn {
+		background: #228B22;
+		border: none;
+		color: #fff;
+		padding: 0.5rem 1rem;
+		border-radius: 20px;
+		cursor: pointer;
+		font-weight: 600;
+		transition: background 0.3s;
+		width: 300px;
+    }
+
+    .date_btn:hover {
+		background: #006400;
+    }
+	
+	.date_btn:disabled {
+		background: #ccc;
+		cursor: not-allowed;
+	}
+
+	header {
+		position: fixed;
+		top: 0;
+		width: 100%;
+		background: rgba(255, 255, 255, 0.9);
+		backdrop-filter: blur(6px);
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 15px 8%;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+		z-index: 1000;
+    }
+    header nav ul {
+		list-style: none;
+		display: flex;
+		gap: 25px;
+    }
+    header nav ul li a {
+		text-decoration: none;
+		font-size: 16px;
+		color: #000;
+		transition: color 0.3s;
+    }
+    header nav ul li a:hover {
+		color: rgb(34, 139, 34);
+    }
+    .btn-primary {
+		background: rgb(34, 139, 34);
+		color: #fff;
+		padding: 10px 18px;
+		border-radius: 25px;
+		text-decoration: none;
+		font-size: 15px;
+		font-weight: 500;
+		transition: background 0.3s;
+    }
+    .btn-primary:hover {
+		background: rgb(0, 100, 0);
+    }
+	
+	</style>
+</head>
+
+<body>
+
+	<br><br><br>
+	<header>
+    <nav>
+      <ul>
+        <li><a href="HomePage.html">Home</a></li>
+        <li><a href="AboutUs.html">About us</a></li>
+        <li><a href="ContactUs.html">Contact us</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </nav>
+    <a href="Appointments.html" class="btn-primary">Book Appointment</a>
+  </header>
+
+
+	<h1>Select Time Slot</h1>
+	<div class="menu" id="dates"> 
+		
+		<button class="date_btn" id="date1"></button>
+		<button class="date_btn" id="date2"></button>
+		<button class="date_btn" id="date3"></button>
+		<button class="date_btn" id="date4"></button>
+		
+	</div>
+	<br>
+	<div class="menu" id="slots_container">  </div>
+	<script>
+		fetch('/dates')
+		.then(res => res.json())
+		.then(dates => {
+			let uniqueDates = [...new Set(dates)];
+			document.getElementById('date1').innerText = uniqueDates[0];
+			document.getElementById("date1").onclick = () => loadSlots(uniqueDates[0]);
+
+			document.getElementById('date2').innerText = uniqueDates[1];
+			document.getElementById("date2").onclick = () => loadSlots(uniqueDates[1]);
+			
+			document.getElementById('date3').innerText = uniqueDates[2];
+			document.getElementById("date3").onclick = () => loadSlots(uniqueDates[2]);
+
+			document.getElementById('date4').innerText = uniqueDates[3];
+			document.getElementById("date4").onclick = () => loadSlots(uniqueDates[3]);
+		});
+
+		function loadSlots(inp_date) {
+			timeSlots=[];
+			availability=[];
+
+			fetch('/slots')
+			.then(res => res.json())
+			.then(data => {				
+				const {date, allSlots, available } = data;
+
+				data.date.forEach((d, i) => {
+					if (d === inp_date) {
+						timeSlots.push(data.allSlots[i]);
+						availability.push(data.available[i]);
+					}
+				});
+
+				const container = document.getElementById("slots_container");
+				container.innerHTML = ""; // clear previous
+
+				timeSlots.forEach((slot, index) => {
+					const isAvailable = availability[index] === "1";
+
+					const tile = document.createElement("div");
+					tile.className = "slot";
+					tile.innerHTML = `<span>${slot}</span> <button class="book_btn" ${!isAvailable ? "disabled" : ""} onclick="confirmBooking('${slot}', '${inp_date}')"> Book </button>`;
+					container.appendChild(tile);
+				});
+				})
+				.catch(err => {
+				console.error('Failed to fetch appointment data:', err);
+				});
+		}
+		
+		function confirmBooking(slotTime, slotDate) {
+			const confirmed = confirm(`Are you sure you want to book the slot at ${slotTime}?`);
+			if (confirmed) {
+				sessionStorage.setItem("slot_time", slotTime);
+				sessionStorage.setItem("slot_date", slotDate);
+				sessionStorage.setItem("slot_av", 0);
+				window.location.href = "Acknowledgement.html";	
+			} else {
+			}
+		}
+		
+	</script>
+</body>
+</html>

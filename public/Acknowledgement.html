@@ -1,0 +1,131 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Confirm Appointment</title>
+	<style>
+    body {
+		background: #f4f6f9;
+		font-family: 'Segoe UI', sans-serif;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100vh;
+		margin: 0;
+    }
+
+    .confirmation-box {
+		background: #ffffff;
+		padding: 2.5rem;
+		border-radius: 12px;
+		box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+		text-align: center;
+		max-width: 600px;
+    }
+
+    .confirmation-box h1 {
+		color: #28a745;
+		margin-bottom: 1rem;
+		font-size: 2rem;
+    }
+
+    .confirmation-box p {
+		color: #444;
+		font-size: 1.05rem;
+		margin-bottom: 2rem;
+    }
+
+    .confirmation-box .slot-time {
+		font-weight: bold;
+		color: #333;
+		margin-bottom: 1rem;
+    }
+
+    .confirmation-box button {
+		background-color: #0056b3;
+		border: none;
+		padding: 10px 20px;
+		border-radius: 6px;
+		color: white;
+		font-size: 1rem;
+		cursor: pointer;
+    }
+
+    .confirmation-box button:hover {
+		background-color: #0056b3;
+    }
+	
+	.required {
+		color: red;
+		font-weight: bold;
+	}
+	
+	small {
+		color: gray;
+		font-style: italic;
+	}
+	.input-box {
+		width: 260px;
+		padding: 12px;
+		font-size: 15px;
+		border: 2px solid #ccc;
+		border-radius: 8px;
+		outline: none;
+		transition: border-color 0.3s;
+	}
+
+	.input-box:focus {
+		border-color: #0056b3;
+	}
+	</style>
+</head>
+<body>
+
+	<div class="confirmation-box" id="mainbox">
+		<form id="infoForm" autocomplete="off">
+			<label for="name">Booking Name <span class="required">* </span></label>
+			<input type="text" id="name" name="name" class="input-box" required>
+			<br><br>
+			<label for="phone">Phone Number <span class="required">* </span></label>
+			<input type="tel" id="phone" name="phone" class="input-box" pattern="[0-9]{10}" required>
+			<br><br>
+			<label for="reason">Reason of visit </label>
+			<input type="text" id="reason" name="reason" class="input-box">
+			<br><br>
+			<label for="age">Age </label>
+			<input type="number" id="age" name="age" min="1" max="120" class="input-box" required>
+			<br><br>
+			<button type="submit" class="confirmation-box button">Submit</button>
+		</form>
+	</div>
+
+
+	<script>
+		document.getElementById("infoForm").addEventListener("submit", submitForm);	
+		function submitForm(e){
+			e.preventDefault();
+			const container = document.getElementById("mainbox");
+			const slot = sessionStorage.getItem("slot_time");
+			const bookDate = sessionStorage.getItem("slot_date");
+			const av = sessionStorage.getItem("slot_av");
+
+			const book_name = document.getElementById("name").value;
+			const book_phone = document.getElementById("phone").value;
+			const book_reason = document.getElementById("reason").value;
+			const book_age = document.getElementById("age").value;
+			
+			fetch("/updateAvailability", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ bookDate, slot, av, book_name, book_phone, book_reason, book_age })
+			})
+			.then(res => res.text())
+			.then(msg => console.log(msg));
+			container.innerHTML =`<h1>Appointment Booked!</h1><p>Thank you for booking your appointment.</p><div class="slot-time"> Your slot: <span id="slot-time">${bookDate} ${slot}</span></div>`;
+		}
+		
+	</script>
+</body>
+</html>

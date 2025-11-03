@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      width: 380px;
+      padding: 40px 30px;
+      background: #fff;
+      border: 2px solid rgb(34, 139, 34);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .login-container h2 {
+      text-align: center;
+      color: rgb(34, 139, 34);
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: 0.2s ease;
+    }
+
+    .input-group input:focus {
+      border-color: rgb(34, 139, 34);
+      outline: none;
+      box-shadow: 0 0 4px rgba(34, 139, 34, 0.4);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: rgb(34, 139, 34);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-login:hover {
+      background-color: rgb(28, 119, 28);
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 15px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .login-footer a {
+      color: rgb(34, 139, 34);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 450px) {
+      .login-container {
+        width: 90%;
+        padding: 30px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" required id="username" placeholder="Enter username" required />
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" required id="password" placeholder="Enter password" required />
+      </div>
+      <button type="submit" class="btn-login">Login</button>
+    </form>
+    
+  </div>
+
+  <script>
+	const allowed = /^[A-Za-z0-9_@*]*$/;
+
+	document.getElementById('username').addEventListener('input', function() {
+	  if (!allowed.test(this.value)) {
+		this.value = this.value.replace(/[^A-Za-z0-9_@*]/g, '');
+	  }
+	});
+
+	document.getElementById('password').addEventListener('input', function() {
+	  if (!allowed.test(this.value)) {
+		this.value = this.value.replace(/[^A-Za-z0-9_@*]/g, '');
+	  }
+	});
+
+	
+	const form = document.getElementById('loginForm');
+
+	form.addEventListener('submit', async (e) => {
+	e.preventDefault(); // prevent default page reload
+
+	const username = document.getElementById('username').value;
+	const password = document.getElementById('password').value;
+
+	try {
+		const res = await fetch('/admin/login', {
+			method: 'POST',
+			headers: {
+			'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ username, password })
+		});
+
+		if (res.ok) {
+			// Login successful → redirect to abc.html
+			window.location.href = 'Admin.html';
+		} 
+		else if (res.status === 401) {
+			alert('Invalid username or password');
+		} 
+		else {
+			const text = await res.text();
+			alert('Error: ' + text);
+		}
+		} 
+		catch (err) {
+			console.error(err);
+			alert('Network or server error');
+		}
+	});
+
+	</script>
+</body>
+</html>
